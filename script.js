@@ -1,256 +1,85 @@
-/* style.css */
-/* 1. LAYOUT BÁSICO E CONTAINER */
-body {
-    background-color: #000; /* Fundo preto */
-    color: #fff; /* Texto branco */
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh; /* Ocupa a altura total da tela */
-}
+document.addEventListener('DOMContentLoaded', () => {
+    // Seleciona todos os botões que têm a classe 'next-btn'
+    const buttons = document.querySelectorAll('.next-btn');
+    const FADE_DURATION = 1000; // 1 segundo (Deve ser o mesmo valor definido no CSS: transition: opacity 1s)
 
-#intro-container {
-    position: relative; /* Ponto de referência para as cenas */
-    width: 800px; /* Largura das suas imagens */
-    height: 600px; /* Altura das suas imagens */
-    overflow: hidden; /* Garante que nada saia do limite */
-}
+    // Referência à imagem da Terra na primeira cena
+    const earthImage = document.querySelector('#scene-1 .earth-image');
 
-/* ------------------------------------------- */
-/* 2. ESTILOS DAS CENAS E TRANSIÇÃO */
-/* ------------------------------------------- */
-
-.scene {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 1; 
-    /* Esta linha é crucial para o FADE do JavaScript */
-    transition: opacity 1s ease-in-out; 
-    box-sizing: border-box; 
-    /* Adicionado display: flex para ajudar a centralizar elementos */
-    display: flex;
-    flex-direction: column;
+    // 1. Configuração Inicial: Garante que todas as cenas, exceto a primeira, estejam ocultas.
     
-    /* ALTERAÇÃO: Mudamos a justificação para o topo ou removemos para confiar no 'absolute' */
-    justify-content: flex-start; /* Confia no posicionamento absoluto dos elementos */
-    
-    align-items: center;
-}
+    // Esconde todas as cenas, da Cena 2 até a Cena 6
+    for (let i = 2; i <= 6; i++) {
+        const scene = document.getElementById(`scene-${i}`);
+        if (scene) {
+            scene.classList.add('hidden');
+        }
+    }
 
-.scene.hidden {
-    /* O JS define a opacidade para 0, e depois o display para none */
-    display: none;
-    opacity: 0;
-}
+    // Inicia a animação da Terra imediatamente na Cena 1
+    if (earthImage) {
+        earthImage.classList.remove('paused-spin'); 
+    }
 
-/* ------------------------------------------- */
-/* 3. ESTILOS DA IMAGEM, LEGENDA E BOTÃO */
-/* ------------------------------------------- */
+    /**
+     * Gerencia a transição de Fade Out/Fade In entre duas cenas.
+     * @param {string} currentSceneId O ID da cena atual (que irá desaparecer).
+     * @param {string} nextSceneId O ID da próxima cena (que irá aparecer ou 'end-game').
+     */
+    const transitionScene = (currentSceneId, nextSceneId) => {
+        const currentScene = document.getElementById(currentSceneId);
+        const nextScene = document.getElementById(nextSceneId);
 
-/* Imagem de Fundo */
-.scene img {
-    position: absolute; 
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover; 
-    z-index: 1; /* Abaixo do texto e botão */
-}
+        if (!currentScene) return;
 
+        // AÇÃO ESPECÍFICA: Se estamos na Cena 1, pausa o giro da Terra.
+        if (currentSceneId === 'scene-1' && earthImage) {
+            earthImage.classList.add('paused-spin'); 
+        }
 
-.caption {
-    position: absolute; 
-    
-    /* 1. Mover para o TOPO (substitui o 'bottom') */
-    top: 30px; 
-    /* 2. Mover para a DIREITA */
-    right: 30px; 
-    
-    /* Remover a centralização horizontal anterior */
-    left: auto; 
-    transform: none; 
-    
-    /* Ajuste a largura ou use 'auto' para que ela se ajuste ao texto */
-    width: auto; 
-    max-width: 500px; /* Limita o tamanho máximo, se necessário */
-    
-    /* 3. Alinhar o texto à direita */
-    text-align: right; 
-    
-    padding: 10px 20px;
-    background-color: rgba(0, 0, 0, 0.7); 
-    color: #fff; 
-    font-size: 1.5em;
-    border-radius: 5px;
-    z-index: 20; 
-    margin: 0; 
-}
+        // 1. FADE OUT: Inicia a transição tornando a cena atual transparente (dura 1s)
+        currentScene.style.opacity = 0;
+        
+        // 2. Aguarda a duração total do Fade Out
+        setTimeout(() => {
+            
+            // 3. DESAPARECIMENTO: Adiciona 'hidden' para remover a cena do fluxo (display: none).
+            currentScene.classList.add('hidden'); 
 
-/* Botão de Avançar */
-.next-btn {
-    position: absolute;
-    bottom: 10px; 
-    padding: 10px 20px;
-    font-size: 1.2em;
-    cursor: pointer;
-    background-color: #AEC6CF;
-    color: black;
-    border: none;
-    border-radius: 5px;
-    z-index: 10;
-    left: 50%;
-    transform: translateX(-50%);
-    transition: background-color 0.3s;
-}
+            // 4. Verifica se é o último passo (fim do jogo)
+            if (nextSceneId === 'end-game') {
+                alert('FIM DA INTRODUÇÃO! Iniciando Jogo...');
+                // Coloque seu código de redirecionamento para a próxima página aqui, por exemplo:
+                // window.location.href = 'menu.html'; 
+                return;
+            }
 
-/* Container principal que centraliza tudo */
-#intro-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh; /* Ocupa a altura total da tela */
-    width: 100vw;
-    background-color: #000; /* Fundo preto para drama */
-}
+            // 5. PRÓXIMA CENA: Mostra a nova cena (retira o display: none)
+            if (nextScene) {
+                nextScene.classList.remove('hidden');
+                
+                // 6. FADE IN: Com um pequeno atraso, aplica opacidade 1 para iniciar o Fade In suave.
+                setTimeout(() => {
+                    nextScene.style.opacity = 1;
+                }, 10); 
+            }
 
-/* Estilo da cena específica */
-.initial-scene {
-    position: relative;
-    text-align: center;
-}
+        }, FADE_DURATION);
+    };
 
-/* Garante que a imagem se ajuste bem e adicione um efeito visual */
-.initial-scene img {
-    /* Efeito de filtro para deixar a imagem mais intensa ou escura */
-    filter: brightness(0.8) contrast(1.2); 
-    display: block;
-    max-width: 100%;
-    height: auto;
-}
-
-/* Caixa para o texto principal */
-.caption-box {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 80%;
-}
-
-/* Título em destaque */
-.caption-box .title {
-    font-size: 3em;
-    color: #FFCC00; /* Amarelo (laranja) solar */
-    text-shadow: 0 0 10px rgba(255, 150, 0, 0.8), 0 0 20px rgba(255, 0, 0, 0.5); /* Efeito de brilho de lava */
-    font-family: 'Impact', sans-serif; /* Use uma fonte épica, se tiver */
-    letter-spacing: 5px;
-}
-
-/* Botão de avançar */
-.next-btn {
-    position: absolute;
-    bottom: 50px; /* Distância da parte inferior */
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 15px 30px;
-    border: 3px solid #ADD8E6; /* Borda azul clara sutil */
-    background-color: rgba(0, 0, 0, 0.5); /* Fundo semi-transparente */
-    color: #fff;
-    font-size: 1.2em;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.next-btn:hover {
-    background-color: #ADD8E6; /* Azul claro ao passar o mouse */
-    color: #000;
-}
-
-/* Container de Informação (Opcional, mas recomendado para agrupar) */
-/* Se não usar este container, garanta que .caption e .description tenham top/right coordenados. */
-.top-right-info {
-    position: absolute;
-    top: 30px;
-    right: 30px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end; /* Alinha o texto à direita */
-    z-index: 20;
-}
-
-/* Estilo do Título Principal */
-.caption {
-    /* Usando top/right absoluto para posicionar no canto */
-    position: absolute; 
-    top: 30px; 
-    right: 30px; 
-    left: auto;
-    transform: none;
-}
- 
-/* Container de Informação (Opcional, mas recomendado para agrupar) */
-/* Se não usar este container, garanta que .caption e .description tenham top/right coordenados. */
-.top-right-info {
-    position: absolute;
-    top: 30px;
-    right: 30px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end; /* Alinha o texto à direita */
-    z-index: 20;
-}
-
-/* Estilo do Título Principal */
-.caption {
-    /* Usando top/right absoluto para posicionar no canto */
-    position: absolute; 
-    top: 30px; 
-    right: 30px; 
-    left: auto;
-    transform: none; 
-
-    /* Estilos de Aparência */
-    width: auto;
-    max-width: 500px;
-    text-align: right; 
-    padding: 10px 20px;
-    background-color: rgba(0, 0, 0, 0.7); 
-    color: #FFfFfF; /* Cor */
-    font-size: 2.5em;
-    border-radius: 5px;
-    z-index: 20; 
-    margin-bottom: 5px; /* Espaço entre o título e a descrição */
-}
-
-/* Estilo da Descrição Abaixo do Título */
-.description {
-    position: absolute;
-    /* Posição calculada para ficar abaixo do título */
-    top: 120px; /* Ajuste este valor se o título for maior */
-    right: 30px; 
-    left: auto;
-    transform: none; 
-    
-    /* Estilos de Aparência */
-    width: auto;
-    max-width: 500px; 
-    text-align: right; 
-    padding: 10px 20px;
-    background-color: rgba(0, 0, 0, 0.5); 
-    color: #fff; 
-    font-size: 1em; 
-    line-height: 1.4;
-    border-radius: 5px;
-    z-index: 20;
-}
-
-
-
-
+    // 7. Adiciona o ouvinte de clique a TODOS os botões de avanço
+    buttons.forEach(button => {
+        button.addEventListener('click', (event) => {
+            // Pega o elemento pai mais próximo que tem a classe 'scene' (a cena atual)
+            const currentScene = event.target.closest('.scene');
+            const currentSceneId = currentScene ? currentScene.id : null;
+            
+            // Pega o ID da próxima cena a partir do atributo data-next-scene
+            const nextSceneId = event.target.dataset.nextScene; 
+            
+            if (currentSceneId) {
+                transitionScene(currentSceneId, nextSceneId);
+            }
+        });
+    });
+});
