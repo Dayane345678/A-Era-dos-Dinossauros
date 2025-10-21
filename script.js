@@ -1,65 +1,65 @@
-/* style.css */
-/* 1. LAYOUT BÁSICO E CONTAINER */
-body {
-    background-color: #000; /* Fundo preto */
-    color: #fff; /* Texto branco */
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh; /* Ocupa a altura total da tela */
-}
+document.addEventListener('DOMContentLoaded', () => {
+    // Seleciona todos os botões que têm a classe 'next-btn'
+    const buttons = document.querySelectorAll('.next-btn');
+    const FADE_DURATION = 1000; // 1 segundo (Deve ser o mesmo valor definido no CSS: transition: opacity 1s)
 
-#intro-container {
-    position: relative; /* Ponto de referência para as cenas */
-    width: 800px; /* Largura das suas imagens */
-    height: 600px; /* Altura das suas imagens */
-    overflow: hidden; /* Garante que nada saia do limite */
-}
+    // Referência à imagem da Terra na primeira cena
+    const earthImage = document.querySelector('#scene-1 .earth-image');
 
-/* ------------------------------------------- */
-/* 2. ESTILOS DAS CENAS E TRANSIÇÃO */
-/* ------------------------------------------- */
-
-.scene {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 1; 
-    /* Esta linha é crucial para o FADE do JavaScript */
-    transition: opacity 1s ease-in-out; 
-    box-sizing: border-box; 
-    /* Adicionado display: flex para ajudar a centralizar elementos */
-    display: flex;
-    flex-direction: column;
+    // 1. Configuração Inicial: Garante que todas as cenas, exceto a primeira, estejam ocultas.
     
-    /* ALTERAÇÃO: Mudamos a justificação para o topo ou removemos para confiar no 'absolute' */
-    justify-content: flex-start; /* Confia no posicionamento absoluto dos elementos */
-    
-    align-items: center;
-}
+    // Esconde todas as cenas, da Cena 2 até a Cena 6
+    for (let i = 2; i <= 6; i++) {
+        const scene = document.getElementById(`scene-${i}`);
+        if (scene) {
+            scene.classList.add('hidden');
+        }
+    }
 
-.scene.hidden {
-    /* O JS define a opacidade para 0, e depois o display para none */
-    display: none;
-    opacity: 0;
-}
+    // Inicia a animação da Terra imediatamente na Cena 1
+    if (earthImage) {
+        earthImage.classList.remove('paused-spin'); 
+    }
 
-/* ------------------------------------------- */
-/* 3. ESTILOS DA IMAGEM, LEGENDA E BOTÃO */
-/* ------------------------------------------- */
+    /**
+     * Gerencia a transição de Fade Out/Fade In entre duas cenas.
+     * @param {string} currentSceneId O ID da cena atual (que irá desaparecer).
+     * @param {string} nextSceneId O ID da próxima cena (que irá aparecer ou 'end-game').
+     */
+    const transitionScene = (currentSceneId, nextSceneId) => {
+        const currentScene = document.getElementById(currentSceneId);
+        const nextScene = document.getElementById(nextSceneId);
 
-/* Imagem de Fundo */
-.scene img {
-    position: absolute; 
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover; 
-    z-index: 1; /* Abaixo do texto e botão */
-}
+        if (!currentScene) return;
+
+        // AÇÃO ESPECÍFICA: Se estamos na Cena 1, pausa o giro da Terra.
+        if (currentSceneId === 'scene-1' && earthImage) {
+            earthImage.classList.add('paused-spin'); 
+        }
+
+        // 1. FADE OUT: Inicia a transição tornando a cena atual transparente (dura 1s)
+        currentScene.style.opacity = 0;
+        
+        // 2. Aguarda a duração total do Fade Out
+        setTimeout(() => {
+            
+            // 3. DESAPARECIMENTO: Adiciona 'hidden' para remover a cena do fluxo (display: none).
+            currentScene.classList.add('hidden'); 
+
+            // 4. Verifica se é o último passo (fim do jogo)
+            if (nextSceneId === 'end-game') {
+                alert('FIM DA INTRODUÇÃO! Iniciando Jogo...');
+                // Coloque seu código de redirecionamento para a próxima página aqui, por exemplo:
+                // window.location.href = 'menu.html'; 
+                return;
+            }
+
+            // 5. PRÓXIMA CENA: Mostra a nova cena (retira o display: none)
+            if (nextScene) {
+                nextScene.classList.remove('hidden');
+                
+                // 6. FADE IN: Com um pequeno atraso, aplica opacidade 1 para iniciar o Fade In suave.
+                setTimeout(() => {
+                    nextScene.style.opacity = 1;
+                }, 10); 
+            }
