@@ -1,108 +1,146 @@
 // ===============================================
-// ARQUIVO: script.js
-// FUNÇÃO: Gerenciar a navegação com transição de fade-out/fade-in
+// ARQUIVO: script.js (Transição Automática)
 // ===============================================
 
 document.addEventListener('DOMContentLoaded', initializeApp);
 
-// Duração da transição em milissegundos (DEVE ser igual a 'transition: opacity' no seu CSS)
-const FADE_DURATION = 1000; 
+// Duração da transição CSS (para o Fade-out/Fade-in)
+const FADE_DURATION = 1000; // 1 segundo no CSS
+
+// Tempo que cada cena fica VISÍVEL antes de iniciar o próximo Fade-out
+const VIEW_DURATION = 5000; // 5 segundos (ajuste conforme necessário)
+
+// Array contendo a ordem das cenas a serem exibidas
+const SCENE_ORDER = [
+    'scene-1',
+    'scene-2',
+    'scene-3',
+    'scene-4',
+    'scene-5',
+    'scene-6'
+];
 
 /**
- * Função de inicialização: Executada após o carregamento do HTML.
- * Configura o estado inicial das cenas e os event listeners.
+ * Função de inicialização: Configura o estado inicial das cenas e inicia a transição.
  */
 function initializeApp() {
     // 1. Configuração Inicial das Cenas
     const scenes = document.querySelectorAll('.scene');
     
+    // Oculta e remove do layout todas as cenas, exceto a primeira
     scenes.forEach(scene => {
-        // Inicialmente, todas as cenas são ocultadas (opacidade 0, classe 'hidden' no CSS)
-        scene.classList.add('hidden');
-        // E removidas do fluxo do layout (display: none, classe 'removed' no CSS)
-        scene.classList.add('removed');
+        if (scene.id !== 'scene-1') {
+            scene.classList.add('hidden');
+            scene.classList.add('removed');
+        } else {
+            // Garante que a primeira cena esteja visível para iniciar o processo
+            scene.classList.remove('removed');
+            scene.classList.remove('hidden');
+        }
     });
-
-    // 2. Revela a primeira cena ('scene-1')
-    const firstScene = document.getElementById('scene-1');
-    if (firstScene) {
-        // A cena 1 é a única que precisa ser exibida no início.
-        
-        // Remove 'removed' para que o display: flex (definido no .scene) funcione
-        firstScene.classList.remove('removed'); 
-        
-        // Pequeno atraso para garantir que o 'display' foi aplicado antes de mudar a opacidade
-        setTimeout(() => {
-            // Remove 'hidden' para iniciar o FADE-IN da primeira cena
-            firstScene.classList.remove('hidden'); 
-        }, 50);
-    }
     
-    // 3. Configura os ouvintes de clique nos botões
-    setupEventListeners();
+    // 2. Inicia a transição automática
+    startAutoTransition(0); // Começa com o índice da primeira cena ('scene-1')
 }
 
 /**
- * Configura os ouvintes de clique para todos os botões de avanço (.next-btn).
+ * Inicia o loop automático de transição.
+ * @param {number} index O índice da cena atual no array SCENE_ORDER.
  */
-function setupEventListeners() {
-    const buttons = document.querySelectorAll('.next-btn');
+function startAutoTransition(index) {
+    const currentSceneId = SCENE_ORDER[index];
     
-    buttons.forEach(button => {
-        button.addEventListener('click', (event) => {
-            // Encontra a cena pai (a cena atual)
-            const currentScene = event.target.closest('.scene');
-            const currentSceneId = currentScene ? currentScene.id : null;
-            
-            // Pega o ID da próxima cena do atributo data-next-scene no botão
-            const nextSceneId = event.target.dataset.nextScene;
-            
-            // Apenas prossegue se a cena atual e a próxima cena forem identificadas
-            if (currentSceneId && nextSceneId) {
-                transitionScene(currentSceneId, nextSceneId);
-            }
+    // Verifica se há uma próxima cena para avançar
+    const nextIndex = index + 1;
+    const nextSceneId = SCENE_ORDER[nextIndex];
+    
+    // Apenas inicia se a cena atual existir
+    if (!currentSceneId) {
+        console.error("Cena atual não encontrada no array de ordem.");
+        return;
+    }
+
+    // Se for a última cena, apenas a exibe e encerra
+    if (nextIndex >= SCENE_ORDER.length) {
+        // Exibiu a última cena (scene-6). Agora aguarda a duração para finalizar.
+        setTimeout(() => {
+            handleEndOfGame(currentSceneId);
+        }, VIEW_DURATION);
+        return;
+    }
+
+    // 1. Aguarda o tempo de visualização da cena atual
+    setTimeout(() => {
+        
+        // 2. Inicia a transição da cena atual para a próxima
+        transitionScene(currentSceneId, nextSceneId, () => {
+            // 3. CALLBACK: Após o Fade-in da próxima cena terminar, chama a função recursivamente
+            startAutoTransition(nextIndex);
         });
-    });
+
+    }, VIEW_DURATION);
 }
+
 
 /**
  * Gerencia a transição de Fade Out/Fade In entre duas cenas.
+ * Foi modificada para aceitar uma função de callback.
  * @param {string} currentSceneId O ID da cena atual (que irá desaparecer).
- * @param {string} nextSceneId O ID da próxima cena (que irá aparecer ou 'end-game').
+ * @param {string} nextSceneId O ID da próxima cena (que irá aparecer).
+ * @param {function} callback A função a ser executada após o Fade-in completo.
  */
-function transitionScene(currentSceneId, nextSceneId) {
+function transitionScene(currentSceneId, nextSceneId, callback) {
     const currentScene = document.getElementById(currentSceneId);
     const nextScene = document.getElementById(nextSceneId);
 
-    if (!currentScene) return;
+    if (!currentScene || !nextScene) return;
 
-    // 1. FADE OUT: Inicia a transição aplicando a classe 'hidden' (opacity: 0)
+    // A. FADE OUT: Inicia a transição (opacidade para 0)
     currentScene.classList.add('hidden'); 
     
-    // 2. Aguarda a duração total do Fade Out (1000ms)
+    // B. Aguarda a duração total do Fade Out (1000ms)
     setTimeout(() => {
         
-        // 3. DESAPARECIMENTO: Adiciona 'removed' (display: none) APÓS o fade terminar.
+        // C. REMOÇÃO: Adiciona 'removed' (display: none) à cena anterior APÓS o fade terminar.
         currentScene.classList.add('removed'); 
 
-        // 4. Verifica se é o último passo (fim do jogo)
-        if (nextSceneId === 'end-game') {
-            console.log('FIM DA INTRODUÇÃO! Iniciando Jogo...');
-            alert('FIM DA INTRODUÇÃO! Iniciando Jogo de Meteoros...');
-            // Exemplo de redirecionamento para a próxima página do jogo:
-            // window.location.href = 'seu-jogo-aqui.html'; 
-            return;
-        }
-
-        // 5. PRÓXIMA CENA: Remove 'removed' para que ela apareça no layout
-        if (nextScene) {
-            nextScene.classList.remove('removed');
+        // D. PRÓXIMA CENA: Remove 'removed' para que ela apareça no layout (display: flex)
+        nextScene.classList.remove('removed');
+        
+        // E. FADE IN: Com um pequeno atraso, remove 'hidden' para iniciar o Fade In suave.
+        setTimeout(() => {
+            nextScene.classList.remove('hidden');
             
-            // 6. FADE IN: Com um pequeno atraso, remove 'hidden' para iniciar o Fade In suave.
+            // F. Aguarda a duração do Fade In (1000ms) e executa o callback (para avançar o timer)
             setTimeout(() => {
-                nextScene.classList.remove('hidden');
-            }, 50); // Pequeno delay
-        }
+                if (callback) {
+                    callback();
+                }
+            }, FADE_DURATION);
 
+        }, 50); // Pequeno delay para garantir que o 'display: flex' seja aplicado
+        
     }, FADE_DURATION);
+}
+
+/**
+ * Lida com a etapa final da introdução.
+ * @param {string} lastSceneId O ID da última cena.
+ */
+function handleEndOfGame(lastSceneId) {
+    const lastScene = document.getElementById(lastSceneId);
+
+    // Inicia o Fade Out da última cena
+    if (lastScene) {
+        lastScene.classList.add('hidden');
+        
+        // Aguarda o Fade Out terminar
+        setTimeout(() => {
+            lastScene.classList.add('removed');
+            console.log('FIM DA INTRODUÇÃO! Iniciando Jogo de Meteoros...');
+            alert('FIM DA INTRODUÇÃO! Iniciando Jogo de Meteoros...');
+            // Exemplo de redirecionamento:
+            // window.location.href = 'seu-jogo-aqui.html';
+        }, FADE_DURATION);
+    }
 }
