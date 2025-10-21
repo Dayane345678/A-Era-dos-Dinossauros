@@ -30,12 +30,9 @@ body {
     position: absolute;
     top: 0;
     left: 0;
-    width: 100% !important;; 
-    height: 100% !important;; 
+    width: 100%;
+    height: 100%;
     opacity: 1; 
-    object-fit: cover !important; /* TESTE: Forçar object-fit */
-    display: block !important; /* TESTE: Forçar display block */
-    z-index: 1;
     /* Esta linha é crucial para o FADE do JavaScript (duração: 1 segundo) */
     transition: opacity 1s ease-in-out; 
     box-sizing: border-box; 
