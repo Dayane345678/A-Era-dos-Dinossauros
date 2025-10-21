@@ -1,26 +1,33 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Seleciona todos os botões que têm a classe 'next-btn'
     const buttons = document.querySelectorAll('.next-btn');
-    const FADE_DURATION = 1000; // 1000ms = 1 segundo (Deve ser o mesmo valor no CSS: 1s)
+    const FADE_DURATION = 1000; // 1000ms = 1 segundo (Deve ser o mesmo valor no CSS: transition: opacity 1s)
 
-    // Referência à imagem da Terra na primeira cena (apenas se houver animação no CSS)
+    // Referência à imagem da Terra na primeira cena (se houver animação no CSS)
     const earthImage = document.querySelector('#scene-1 img'); 
 
-    // 1. Configuração Inicial: Oculta todas as cenas, exceto a primeira.
     const allScenes = document.querySelectorAll('.scene');
-    allScenes.forEach((scene, index) => {
-        // Oculta todas as cenas (da cena 2 em diante)
-        if (index > 0) {
-            scene.classList.add('hidden');
+    const firstScene = document.getElementById('scene-1');
+
+    // 1. Configuração Inicial: Garante que todas as cenas, exceto a primeira, estejam ocultas e com opacidade 0.
+    allScenes.forEach((scene) => {
+        if (scene.id !== 'scene-1') {
+            scene.classList.add('hidden'); // display: none
+            scene.style.opacity = 0; // Garante que a opacidade inicial é zero
+        } else {
+            // Garante que a primeira cena não tem 'hidden' e está pronta para ser exibida
+            scene.classList.remove('hidden'); 
         }
     });
 
-    // Garante que a primeira cena (scene-1) esteja visível e com opacidade 1 no início
-    const firstScene = document.getElementById('scene-1');
+    // Garante que a primeira cena (scene-1) inicie visível com opacidade 1.
     if (firstScene) {
-        firstScene.style.opacity = 1;
-        firstScene.classList.remove('hidden');
+        // Um pequeno atraso garante que o navegador ative a transição de opacidade do CSS
+        setTimeout(() => {
+             firstScene.style.opacity = 1;
+        }, 50); 
     }
+
 
     /**
      * Gerencia a transição de Fade Out/Fade In entre duas cenas.
@@ -59,8 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (nextScene) {
                 nextScene.classList.remove('hidden');
                 
-                // 6. FADE IN: Com um pequeno atraso, define opacidade 1 para o Fade In suave (transição é pelo CSS).
-                // O atraso de 10ms garante que o navegador reconheça que 'hidden' foi removido antes de mudar a opacidade.
+                // 6. FADE IN: Com um pequeno atraso, define opacidade 1 para o Fade In suave.
                 setTimeout(() => {
                     nextScene.style.opacity = 1;
                 }, 10); 
@@ -69,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     // ----------------------------------------------------------------
-    // 7. OUVINTE DE EVENTOS (Listener) - ESSA É A PARTE MAIS IMPORTANTE
+    // 7. OUVINTE DE EVENTOS (Listener)
     // ----------------------------------------------------------------
     buttons.forEach(button => {
         button.addEventListener('click', (event) => {
