@@ -49,13 +49,18 @@ body {
     align-items: center;
 }
 
-/* 2. CLASSE OCULTA (Usada para o FADE) */
-/* O JS adiciona/remove esta classe para o efeito de opacidade */
-.scene.hidden {
-    opacity: 0;
-    pointer-events: none;
+/* 1. TRANSIÇÃO: Essencial para o FADE-OUT */
+.scene {
+    /* ... outras regras ... */
+    transition: opacity 1s ease-in-out; /* ESTA LINHA É FUNDAMENTAL */
 }
 
+/* 2. OCULTAÇÃO: Essencial para a invisibilidade */
+.scene.hidden {
+    opacity: 0; 
+    pointer-events: none;
+    /* NUNCA coloque 'display: none' aqui! */
+}
 /* ------------------------------------------- */
 /* 3. ESTILOS DA IMAGEM E CONTEÚDO             */
 /* ------------------------------------------- */
