@@ -1,22 +1,25 @@
 /* style.css */
+
 /* 1. LAYOUT BÁSICO E CONTAINER */
 body {
     background-color: #000; /* Fundo preto */
     color: #fff; /* Texto branco */
-    font-family: Arial, sans-serif;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
     margin: 0;
     padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh; /* Ocupa a altura total da tela */
+    overflow: hidden; /* Evita barras de rolagem desnecessárias */
 }
 
 #intro-container {
     position: relative; /* Ponto de referência para as cenas */
     width: 800px; /* Largura das suas imagens */
     height: 600px; /* Altura das suas imagens */
-    overflow: hidden; /* Garante que nada saia do limite */
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); /* Sombra para destacar o container */
 }
 
 /* ------------------------------------------- */
@@ -30,21 +33,21 @@ body {
     width: 100%;
     height: 100%;
     opacity: 1; 
-    /* Esta linha é crucial para o FADE do JavaScript */
+    /* Esta linha é crucial para o FADE do JavaScript (duração: 1 segundo) */
     transition: opacity 1s ease-in-out; 
     box-sizing: border-box; 
-    /* Adicionado display: flex para ajudar a centralizar elementos */
+    
+    /* Configuração Flexbox para posicionar o conteúdo (título, descrição, botão) */
     display: flex;
     flex-direction: column;
-    
-    /* ALTERAÇÃO: Mudamos a justificação para o topo ou removemos para confiar no 'absolute' */
-    justify-content: flex-start; /* Confia no posicionamento absoluto dos elementos */
-    
     align-items: center;
+    justify-content: space-between; /* Espaço entre os elementos de topo e base */
+    padding: 30px; /* Preenchimento interno */
+    z-index: 5; /* Garante que os elementos de conteúdo estejam acima da imagem */
 }
 
 .scene.hidden {
-    /* O JS define a opacidade para 0, e depois o display para none */
+    /* O JS define a opacidade para 0 primeiro, e depois o display para none após o fade out */
     display: none;
     opacity: 0;
 }
@@ -53,7 +56,7 @@ body {
 /* 3. ESTILOS DA IMAGEM, LEGENDA E BOTÃO */
 /* ------------------------------------------- */
 
-/* Imagem de Fundo */
+/* Imagem de Fundo (z-index baixo) */
 .scene img {
     position: absolute; 
     top: 0;
@@ -64,190 +67,54 @@ body {
     z-index: 1; /* Abaixo do texto e botão */
 }
 
-
+/* Título */
 .caption {
-    position: absolute; 
-    
-    /* 1. Mover para o TOPO (substitui o 'bottom') */
-    top: 30px; 
-    /* 2. Mover para a DIREITA */
-    right: 30px; 
-    
-    /* Remover a centralização horizontal anterior */
-    left: auto; 
-    transform: none; 
-    
-    /* Ajuste a largura ou use 'auto' para que ela se ajuste ao texto */
-    width: auto; 
-    max-width: 500px; /* Limita o tamanho máximo, se necessário */
-    
-    /* 3. Alinhar o texto à direita */
-    text-align: right; 
-    
+    font-size: 2.8em;
+    text-align: center;
+    text-transform: uppercase;
+    z-index: 10;
     padding: 10px 20px;
-    background-color: rgba(0, 0, 0, 0.7); 
-    color: #fff; 
-    font-size: 1.5em;
+    background: rgba(0, 0, 0, 0.6); /* Fundo semi-transparente para o título */
     border-radius: 5px;
-    z-index: 20; 
-    margin: 0; 
+    letter-spacing: 2px;
+    margin-top: 20px;
+}
+
+/* Descrição */
+.description {
+    max-width: 80%;
+    text-align: center;
+    line-height: 1.6;
+    z-index: 10;
+    /* Empurra a descrição para cima, deixando espaço para o botão */
+    margin-top: auto; 
+    margin-bottom: 20px;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.8); /* Fundo forte para melhor leitura */
+    border-radius: 8px;
+    font-size: 1.1em;
 }
 
 /* Botão de Avançar */
 .next-btn {
-    position: absolute;
-    bottom: 10px; 
-    padding: 10px 20px;
-    font-size: 1.2em;
-    cursor: pointer;
-    background-color: #AEC6CF;
-    color: black;
-    border: none;
-    border-radius: 5px;
     z-index: 10;
-    left: 50%;
-    transform: translateX(-50%);
-    transition: background-color 0.3s;
-}
-
-/* Container principal que centraliza tudo */
-#intro-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh; /* Ocupa a altura total da tela */
-    width: 100vw;
-    background-color: #000; /* Fundo preto para drama */
-}
-
-/* Estilo da cena específica */
-.initial-scene {
-    position: relative;
-    text-align: center;
-}
-
-/* Garante que a imagem se ajuste bem e adicione um efeito visual */
-.initial-scene img {
-    /* Efeito de filtro para deixar a imagem mais intensa ou escura */
-    filter: brightness(0.8) contrast(1.2); 
-    display: block;
-    max-width: 100%;
-    height: auto;
-}
-
-/* Caixa para o texto principal */
-.caption-box {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 80%;
-}
-
-/* Título em destaque */
-.caption-box .title {
-    font-size: 3em;
-    color: #FFCC00; /* Amarelo (laranja) solar */
-    text-shadow: 0 0 10px rgba(255, 150, 0, 0.8), 0 0 20px rgba(255, 0, 0, 0.5); /* Efeito de brilho de lava */
-    font-family: 'Impact', sans-serif; /* Use uma fonte épica, se tiver */
-    letter-spacing: 5px;
-}
-
-/* Botão de avançar */
-.next-btn {
-    position: absolute;
-    bottom: 50px; /* Distância da parte inferior */
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 15px 30px;
-    border: 3px solid #ADD8E6; /* Borda azul clara sutil */
-    background-color: rgba(0, 0, 0, 0.5); /* Fundo semi-transparente */
-    color: #fff;
+    padding: 12px 25px;
     font-size: 1.2em;
+    font-weight: bold;
     cursor: pointer;
+    background-color: #3f51b5; /* Azul primário, pode mudar para o tema do seu jogo */
+    color: white;
+    border: 2px solid #3f51b5;
+    border-radius: 50px; /* Botão arredondado */
     transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 20px; /* Distância da borda inferior */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .next-btn:hover {
-    background-color: #ADD8E6; /* Azul claro ao passar o mouse */
-    color: #000;
+    background-color: #2c3e50; /* Cor de hover mais escura */
+    border-color: #2c3e50;
+    transform: translateY(-2px); /* Efeito sutil de elevação */
 }
-
-/* Container de Informação (Opcional, mas recomendado para agrupar) */
-/* Se não usar este container, garanta que .caption e .description tenham top/right coordenados. */
-.top-right-info {
-    position: absolute;
-    top: 30px;
-    right: 30px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end; /* Alinha o texto à direita */
-    z-index: 20;
-}
-
-/* Estilo do Título Principal */
-.caption {
-    /* Usando top/right absoluto para posicionar no canto */
-    position: absolute; 
-    top: 30px; 
-    right: 30px; 
-    left: auto;
-    transform: none;
-}
- 
-/* Container de Informação (Opcional, mas recomendado para agrupar) */
-/* Se não usar este container, garanta que .caption e .description tenham top/right coordenados. */
-.top-right-info {
-    position: absolute;
-    top: 30px;
-    right: 30px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end; /* Alinha o texto à direita */
-    z-index: 20;
-}
-
-/* Estilo do Título Principal */
-.caption {
-    /* Usando top/right absoluto para posicionar no canto */
-    position: absolute; 
-    top: 30px; 
-    right: 30px; 
-    left: auto;
-    transform: none; 
-
-    /* Estilos de Aparência */
-    width: auto;
-    max-width: 500px;
-    text-align: right; 
-    padding: 10px 20px;
-    background-color: rgba(0, 0, 0, 0.7); 
-    color: #FFfFfF; /* Cor */
-    font-size: 2.5em;
-    border-radius: 5px;
-    z-index: 20; 
-    margin-bottom: 5px; /* Espaço entre o título e a descrição */
-}
-
-/* Estilo da Descrição Abaixo do Título */
-.description {
-    position: absolute;
-    /* Posição calculada para ficar abaixo do título */
-    top: 120px; /* Ajuste este valor se o título for maior */
-    right: 30px; 
-    left: auto;
-    transform: none; 
-    
-    /* Estilos de Aparência */
-    width: auto;
-    max-width: 500px; 
-    text-align: right; 
-    padding: 10px 20px;
-    background-color: rgba(0, 0, 0, 0.5); 
-    color: #fff; 
-    font-size: 1em; 
-    line-height: 1.4;
-    border-radius: 5px;
-    z-index: 20;
-}
-
