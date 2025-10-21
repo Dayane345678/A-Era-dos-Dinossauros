@@ -48,6 +48,10 @@ body {
     opacity: 0;
     pointer-events: none;
 }
+/* 2. Cena Removida - Apenas Removida do Layout (para uso do JS) */
+.scene.removed {
+    display: none; /* Esta nova classe será usada apenas pelo JS */
+}
 
 /* ------------------------------------------- */
 /* 3. ESTILOS DA IMAGEM, LEGENDA E BOTÃO */
