@@ -1,100 +1,65 @@
-// ===============================================
-// ARQUIVO: script.js (Transição Baseada em Clique)
-// ===============================================
-
-document.addEventListener('DOMContentLoaded', initializeApp);
-
-// Duração da transição CSS em milissegundos (DEVE ser igual ao 'transition: opacity' no seu CSS)
-const FADE_DURATION = 1000; 
-
-/**
- * Função de inicialização: Configura o estado inicial das cenas e os event listeners.
- */
-function initializeApp() {
-    // 1. Configuração Inicial das Cenas
-    const scenes = document.querySelectorAll('.scene');
-    
-    // Oculta e remove do layout todas as cenas, exceto a primeira
-    scenes.forEach(scene => {
-        // Todas as cenas, exceto a primeira, devem começar ocultas e fora do fluxo.
-        if (scene.id !== 'scene-1') {
-            scene.classList.add('hidden'); // opacity: 0
-            scene.classList.add('removed'); // display: none
-        } else {
-            // Garante que a primeira cena esteja visível para iniciar.
-            scene.classList.remove('removed');
-            scene.classList.remove('hidden');
-        }
-    });
-    
-    // 2. Configura os ouvintes de clique nos botões
-    setupEventListeners();
-}
-
-/**
- * Configura os ouvintes de clique para todos os botões de avanço (.next-btn).
- */
-function setupEventListeners() {
+document.addEventListener('DOMContentLoaded', () => {
+    // Seleciona todos os botões que têm a classe 'next-btn'
     const buttons = document.querySelectorAll('.next-btn');
-    
-    buttons.forEach(button => {
-        button.addEventListener('click', (event) => {
-            // Encontra a cena pai (a cena atual)
-            const currentScene = event.target.closest('.scene');
-            const currentSceneId = currentScene ? currentScene.id : null;
-            
-            // Pega o ID da próxima cena (ou "end-game") do atributo data-next-scene
-            const nextSceneId = event.target.dataset.nextScene;
-            
-            if (currentSceneId && nextSceneId) {
-                transitionScene(currentSceneId, nextSceneId);
-            }
-        });
-    });
-}
+    const FADE_DURATION = 1000; // 1 segundo (Deve ser o mesmo valor definido no CSS: transition: opacity 1s)
 
-/**
- * Gerencia a transição de Fade Out/Fade In entre duas cenas ou finaliza a introdução.
- * @param {string} currentSceneId O ID da cena atual (que irá desaparecer).
- * @param {string} nextSceneId O ID da próxima cena (ou 'end-game').
- */
-function transitionScene(currentSceneId, nextSceneId) {
-    const currentScene = document.getElementById(currentSceneId);
-    
-    // Garante que a cena atual existe
-    if (!currentScene) return;
+    // Referência à imagem da Terra na primeira cena
+    const earthImage = document.querySelector('#scene-1 .earth-image');
 
-    // 1. FADE OUT: Inicia a transição aplicando a classe 'hidden' (opacity: 0)
-    currentScene.classList.add('hidden'); 
+    // 1. Configuração Inicial: Garante que todas as cenas, exceto a primeira, estejam ocultas.
     
-    // 2. Aguarda a duração total do Fade Out (1000ms)
-    setTimeout(() => {
-        
-        // 3. DESAPARECIMENTO: Adiciona 'removed' (display: none) à cena anterior APÓS o fade.
-        currentScene.classList.add('removed'); 
-
-        // 4. Se for o último botão, finaliza o jogo.
-        if (nextSceneId === 'end-game') {
-            console.log('FIM DA INTRODUÇÃO! Iniciando Jogo...');
-            alert('FIM DA INTRODUÇÃO! Iniciando Jogo...');
-            // AQUI VOCÊ PODE REDIRECIONAR PARA O SEU JOGO:
-            // window.location.href = 'seu-jogo-aqui.html'; 
-            return;
+    // Esconde todas as cenas, da Cena 2 até a Cena 6
+    for (let i = 2; i <= 6; i++) {
+        const scene = document.getElementById(`scene-${i}`);
+        if (scene) {
+            scene.classList.add('hidden');
         }
+    }
 
-        // 5. Se houver uma próxima cena, inicia o FADE IN dela.
+    // Inicia a animação da Terra imediatamente na Cena 1
+    if (earthImage) {
+        earthImage.classList.remove('paused-spin'); 
+    }
+
+    /**
+     * Gerencia a transição de Fade Out/Fade In entre duas cenas.
+     * @param {string} currentSceneId O ID da cena atual (que irá desaparecer).
+     * @param {string} nextSceneId O ID da próxima cena (que irá aparecer ou 'end-game').
+     */
+    const transitionScene = (currentSceneId, nextSceneId) => {
+        const currentScene = document.getElementById(currentSceneId);
         const nextScene = document.getElementById(nextSceneId);
 
-        if (nextScene) {
-            // Remove 'removed' para que ela apareça no layout (display: flex)
-            nextScene.classList.remove('removed');
-            
-            // 6. FADE IN: Com um pequeno atraso, remove 'hidden' para iniciar o Fade In suave.
-            // O pequeno atraso é CRUCIAL para evitar que o navegador pule a transição.
-            setTimeout(() => {
-                nextScene.classList.remove('hidden');
-            }, 50); 
+        if (!currentScene) return;
+
+        // AÇÃO ESPECÍFICA: Se estamos na Cena 1, pausa o giro da Terra.
+        if (currentSceneId === 'scene-1' && earthImage) {
+            earthImage.classList.add('paused-spin'); 
         }
 
-    }, FADE_DURATION);
-}
+        // 1. FADE OUT: Inicia a transição tornando a cena atual transparente (dura 1s)
+        currentScene.style.opacity = 0;
+        
+        // 2. Aguarda a duração total do Fade Out
+        setTimeout(() => {
+            
+            // 3. DESAPARECIMENTO: Adiciona 'hidden' para remover a cena do fluxo (display: none).
+            currentScene.classList.add('hidden'); 
+
+            // 4. Verifica se é o último passo (fim do jogo)
+            if (nextSceneId === 'end-game') {
+                alert('FIM DA INTRODUÇÃO! Iniciando Jogo...');
+                // Coloque seu código de redirecionamento para a próxima página aqui, por exemplo:
+                // window.location.href = 'menu.html'; 
+                return;
+            }
+
+            // 5. PRÓXIMA CENA: Mostra a nova cena (retira o display: none)
+            if (nextScene) {
+                nextScene.classList.remove('hidden');
+                
+                // 6. FADE IN: Com um pequeno atraso, aplica opacidade 1 para iniciar o Fade In suave.
+                setTimeout(() => {
+                    nextScene.style.opacity = 1;
+                }, 10); 
+            }
