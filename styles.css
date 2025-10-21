@@ -56,12 +56,6 @@ body {
     pointer-events: none;
 }
 
-/* 3. CLASSE REMOVIDA (Usada pelo JS) */
-/* O JS adiciona esta classe APÓS o fade-out para remover a cena do layout */
-.scene.removed { 
-    display: none !important; 
-}
-
 /* ------------------------------------------- */
 /* 3. ESTILOS DA IMAGEM E CONTEÚDO             */
 /* ------------------------------------------- */
