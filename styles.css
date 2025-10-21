@@ -45,8 +45,8 @@ body {
 
 .scene.hidden {
     /* O JS define a opacidade para 0, e depois o display para none */
-    display: none;
     opacity: 0;
+    pointer-events: none;
 }
 
 /* ------------------------------------------- */
