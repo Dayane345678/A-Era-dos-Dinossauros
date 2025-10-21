@@ -23,32 +23,31 @@ body {
 /* 2. ESTILOS DAS CENAS E TRANSIÇÃO */
 /* ------------------------------------------- */
 
-.scene {
+/* 1. SELETOR CORRIGIDO: Deve ser .scene, não apenas scene */
+.scene { 
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     opacity: 1; 
-    /* Esta linha é crucial para o FADE do JavaScript */
     transition: opacity 1s ease-in-out; 
     box-sizing: border-box; 
-    /* Adicionado display: flex para ajudar a centralizar elementos */
     display: flex;
     flex-direction: column;
-    
-    /* ALTERAÇÃO: Mudamos a justificação para o topo ou removemos para confiar no 'absolute' */
-    justify-content: flex-start; /* Confia no posicionamento absoluto dos elementos */
-    
+    justify-content: flex-start;
     align-items: center;
 }
 
+/* 2. CLASSE OCULTA: Está correta, pois o ponto não está faltando */
 .scene.hidden {
     /* O JS define a opacidade para 0, e depois o display para none */
     opacity: 0;
     pointer-events: none;
 }
-scene.removed {
+
+/* 3. SELETOR CORRIGIDO: Deve ser .scene.removed, não apenas scene.removed */
+.scene.removed { 
     display: none !important; /* !important garante que o display: flex da .scene seja sobrescrito */
 }
 
