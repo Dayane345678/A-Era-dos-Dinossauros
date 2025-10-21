@@ -1,66 +1,88 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Introdução do Jogo</title>
-   <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
+document.addEventListener('DOMContentLoaded', () => {
+    // Seleciona todos os botões que têm a classe 'next-btn'
+    const buttons = document.querySelectorAll('.next-btn');
+    const FADE_DURATION = 1000; // 1000ms = 1 segundo (Deve ser o mesmo valor no CSS: 1s)
 
-    <div id="intro-container">
-        <div id="scene-1" class="scene">
-            <img src="https://uploads.onecompiler.io/43rztr8hr/43zm9qdbj/1000038858.png" width="800" height="600" alt="Cena 2 do Jogo">
-            <h1 id="text-1" class="caption">A TERRA HADEANA</h1>
-            <p class="description">
-            O INÍCIO QUENTE
-"O planeta recém-nascido é uma bola de fogo líquido. A atividade vulcânica é máxima. A Era Hadeana é a definição de calor extremo, onde o mundo era, em essência, um fogo terrestre." </p>
-            <button class="next-btn" data-next-scene="scene-2">AVANÇAR</button>
-        </div>
-</div>
-        
-        <div id="scene-2" class="scene hidden">
-            <img src="https://uploads.onecompiler.io/43rztr8hr/43zm9qdbj/1000038859.png" width="800" height="600" alt="Cena 2 do Jogo">
-            <h1 id="text-2" class="caption">A TERRA EM SNOW BALL</h1>
-            <p class="description"> O GRANDE CONGELAMENTO
-"Após os primeiros bilhões de anos de caos, a Terra foi forçada a enfrentar um novo e terrível desafio. Há 2 bilhões de anos, nosso mundo mergulhou em um sono profundo de gelo, um fenômeno apocalíptico conhecido como 'Snowball Earth'. Sob o domínio da Geada intensa, até mesmo o fogo primordial se acalmou: os vulcões foram selados, aprisionando o calor no interior do planeta e consagrando a era do gelo que o cobriu por completo. </p>
-            <button class="next-btn" data-next-scene="scene-3">AVANÇAR</button>
-        </div>
-        
-        <div id="scene-3" class="scene hidden">
-            <img src="https://uploads.onecompiler.io/43rztr8hr/43zm9qdbj/1000038857.png" width="800" height="600" alt="Cena 3 do Jogo">
-            <h1 id="text-3" class="caption"> A TERRA ATUAL </h1>
-            <p class="description"> A ERA DA PANGEIA
-"Após o caos Hadeano e o gelo da Snowball, a Terra finalmente encontra uma forma familiar. Há cerca de 225 milhões de anos, os continentes se unem no colossal supercontinente: Pangeia. A atmosfera primitiva, antes letal, enriqueceu-se com os gases da vida produzidos por organismos antigos. Com um oceano vasto e um único bloco de terra, o mundo se preparou para o auge da vida terrestre."</p>
-            <button class="next-btn" data-next-scene="scene-4">AVANÇAR</button>
-        </div>
-        
-        <div id="scene-4" class="scene hidden">
-            <img src="https://uploads.onecompiler.io/43rztr8hr/43zm9qdbj/1000038860.png" width="800" height="600" alt="Cena 4 do Jogo">
-            <h1 id="text-4" class="caption">A TERRA E SUA ATMOSFERA</h1>
-            <p class="description">
-            "Com a nova atmosfera em vigor, a Terra ganhou seu escudo protetor contra a maioria das rochas espaciais. No entanto, durante o Bombardeio Pesado Tardio, meteoritos e cometas gigantes ainda atravessavam as defesas. Esses impactos trouxeram a maior parte da água para o planeta. A atmosfera ajudou a reter esse tesouro líquido, dando origem aos Oceanos Primordiais."</p>
-            <button class="next-btn" data-next-scene="scene-5">AVANÇAR</button>
-        </div>
-        
-        <div id="scene-5" class="scene hidden">
-            <img src="https://uploads.onecompiler.io/43rztr8hr/43zm9qdbj/1000038861.png" width="800" height="600" alt="Cena 5 do Jogo">
-            <h1 id="text-5" class="caption">A TERRA E OS METEORITOS</h1>
-            <p class="description"> 
-            "Nesta fase, a Terra sofreu uma intensa chuva de meteoritos. O lado positivo desse bombardeio brutal é que ele importou a maior parte da água e dos elementos de que o planeta precisava. Sob a nova atmosfera, essa água se acumulou, preenchendo as crateras e preparando o planeta para a vida."</p>
-            <button class="next-btn" data-next-scene="scene-6">AVANÇAR</button>
-        </div>
-        
-        <div id="scene-6" class="scene hidden">
-            <img src="https://uploads.onecompiler.io/43rztr8hr/43zm9qdbj/1000038862.png" width="800" height="600" alt="Cena 6 do Jogo">
-            <h1 id="text-6" class="caption">A ERA DOS DINOSSAUROS</h1>
-            <p class="description"> O FIM DE UMA ERA
-"Por 65 milhões de anos, os dinossauros foram os reis. Agora, o céu se abre com o perigo. A extinção é iminente. Meteoritos se tornaram obstáculos mortais na luta pela sobrevivência. A única regra é correr!"</p>
-            <button class="next-btn" data-next-scene="end-game">INICIAR O JOGO</button>
-        </div>
-        
-    </div>
+    // Referência à imagem da Terra na primeira cena (apenas se houver animação no CSS)
+    const earthImage = document.querySelector('#scene-1 img'); 
 
-    <script src="script.js"></script>
-</body>
-</html>
+    // 1. Configuração Inicial: Oculta todas as cenas, exceto a primeira.
+    const allScenes = document.querySelectorAll('.scene');
+    allScenes.forEach((scene, index) => {
+        // Oculta todas as cenas (da cena 2 em diante)
+        if (index > 0) {
+            scene.classList.add('hidden');
+        }
+    });
+
+    // Garante que a primeira cena (scene-1) esteja visível e com opacidade 1 no início
+    const firstScene = document.getElementById('scene-1');
+    if (firstScene) {
+        firstScene.style.opacity = 1;
+        firstScene.classList.remove('hidden');
+    }
+
+    /**
+     * Gerencia a transição de Fade Out/Fade In entre duas cenas.
+     * @param {string} currentSceneId O ID da cena atual (que irá desaparecer).
+     * @param {string} nextSceneId O ID da próxima cena (que irá aparecer ou 'end-game').
+     */
+    const transitionScene = (currentSceneId, nextSceneId) => {
+        const currentScene = document.getElementById(currentSceneId);
+        const nextScene = document.getElementById(nextSceneId);
+
+        if (!currentScene) return;
+
+        // AÇÃO OPCIONAL: Pausa animação da Terra (se implementada no CSS)
+        if (currentSceneId === 'scene-1' && earthImage) {
+            earthImage.classList.add('paused-spin'); 
+        }
+
+        // 1. FADE OUT: Inicia a transição tornando a cena atual transparente.
+        currentScene.style.opacity = 0;
+        
+        // 2. Aguarda a duração total do Fade Out
+        setTimeout(() => {
+            
+            // 3. DESAPARECIMENTO: Adiciona 'hidden' (display: none) à cena atual.
+            currentScene.classList.add('hidden'); 
+
+            // 4. Se for o último botão, termina a introdução.
+            if (nextSceneId === 'end-game') {
+                console.log('FIM DA INTRODUÇÃO! Iniciando Jogo...');
+                alert('FIM DA INTRODUÇÃO! Iniciando Jogo...');
+                // Adicione aqui a lógica para iniciar o jogo (ex: window.location.href = 'game.html';)
+                return;
+            }
+
+            // 5. PRÓXIMA CENA: Mostra a nova cena (retira o display: none)
+            if (nextScene) {
+                nextScene.classList.remove('hidden');
+                
+                // 6. FADE IN: Com um pequeno atraso, define opacidade 1 para o Fade In suave (transição é pelo CSS).
+                // O atraso de 10ms garante que o navegador reconheça que 'hidden' foi removido antes de mudar a opacidade.
+                setTimeout(() => {
+                    nextScene.style.opacity = 1;
+                }, 10); 
+            }
+        }, FADE_DURATION);
+    };
+    
+    // ----------------------------------------------------------------
+    // 7. OUVINTE DE EVENTOS (Listener) - ESSA É A PARTE MAIS IMPORTANTE
+    // ----------------------------------------------------------------
+    buttons.forEach(button => {
+        button.addEventListener('click', (event) => {
+            // Pega o ID da próxima cena do atributo data-next-scene
+            const nextSceneId = button.getAttribute('data-next-scene');
+            
+            // Encontra a cena pai mais próxima (o elemento .scene)
+            const currentScene = button.closest('.scene');
+            const currentSceneId = currentScene ? currentScene.id : null;
+
+            if (currentSceneId && nextSceneId) {
+                transitionScene(currentSceneId, nextSceneId);
+            }
+        });
+    });
+});
