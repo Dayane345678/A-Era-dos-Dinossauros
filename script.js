@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // =========================================================
-    // 1. VARIÁVEIS DE ELEMENTOS HTML
+    // 1. VARIÁVEIS DE ELEMENTOS HTML 
     // =========================================================
     const introContainer = document.getElementById('intro-container'); // Do seu prompt anterior
     const nextButtons = document.querySelectorAll('.next-btn');       // Do seu prompt anterior
@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
         playerGif.style.top = (rect.top + player.y) + "px";
 
         // Geração e movimento de meteoros
-        if (Math.random() < 0.03) 
+        if (Math.random() < 0.7) 
             createMeteor();
         meteors.forEach(m => m.y += m.speed);
         meteors = meteors.filter(m => m.y < gameCanvas.height);
