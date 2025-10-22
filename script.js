@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
         playerGif.style.top = (rect.top + player.y) + "px";
 
         // Geração e movimento de meteoros
-        if (Math.random() < 0.7) 
+        if (Math.random() < 0.0009) 
             createMeteor();
         meteors.forEach(m => m.y += m.speed);
         meteors = meteors.filter(m => m.y < gameCanvas.height);
