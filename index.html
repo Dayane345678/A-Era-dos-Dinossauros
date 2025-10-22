@@ -12,7 +12,7 @@
     <!-- Cena 1 -->
     <div id="scene-1" class="scene">
         <img src="https://uploads.onecompiler.io/43rztr8hr/43zm9qdbj/1000038858.png" alt="Cena 1">
-        <h1 class="caption">A TERRA HADEANA</h1>
+        <!--<h1 class="caption">A TERRA HADEANA</h1>-->
         <p class="description">O INÍCIO QUENTE: "O planeta recém-nascido é uma bola de fogo líquido. A atividade vulcânica é máxima..."</p>
         <button class="next-btn" data-next-scene="scene-2">AVANÇAR</button>
     </div>
@@ -20,7 +20,7 @@
     <!-- Cena 2 -->
     <div id="scene-2" class="scene hidden">
         <img src="https://uploads.onecompiler.io/43rztr8hr/43zm9qdbj/1000038859.png" alt="Cena 2">
-        <h1 class="caption">A TERRA EM SNOWBALL</h1>
+        <!--<h1 class="caption">A TERRA EM SNOWBALL</h1>-->
         <p class="description">O GRANDE CONGELAMENTO: "Após os primeiros bilhões de anos de caos, a Terra mergulhou em um sono profundo de gelo..."</p>
         <button class="next-btn" data-next-scene="scene-3">AVANÇAR</button>
     </div>
@@ -28,7 +28,7 @@
     <!-- Cena 3 -->
     <div id="scene-3" class="scene hidden">
         <img src="https://uploads.onecompiler.io/43rztr8hr/43zm9qdbj/1000038857.png" alt="Cena 3">
-        <h1 class="caption">A ERA DA PANGEIA</h1>
+        <!--<h1 class="caption">A ERA DA PANGEIA</h1>-->
         <p class="description">"Após o caos Hadeano e o gelo da Snowball, a Terra finalmente encontra uma forma familiar..."</p>
         <button class="next-btn" data-next-scene="scene-4">AVANÇAR</button>
     </div>
@@ -36,7 +36,7 @@
     <!-- Cena 4 -->
     <div id="scene-4" class="scene hidden">
         <img src="https://uploads.onecompiler.io/43rztr8hr/43zm9qdbj/1000038860.png" alt="Cena 4">
-        <h1 class="caption">A TERRA E SUA ATMOSFERA</h1>
+        <!--<h1 class="caption">A TERRA E SUA ATMOSFERA</h1>-->
         <p class="description">"Com a nova atmosfera em vigor, a Terra ganhou seu escudo protetor contra a maioria das rochas espaciais..."</p>
         <button class="next-btn" data-next-scene="scene-5">AVANÇAR</button>
     </div>
@@ -44,7 +44,7 @@
     <!-- Cena 5 -->
     <div id="scene-5" class="scene hidden">
         <img src="https://uploads.onecompiler.io/43rztr8hr/43zm9qdbj/1000038861.png" alt="Cena 5">
-        <h1 class="caption">A TERRA E OS METEORITOS</h1>
+        <!--<h1 class="caption">A TERRA E OS METEORITOS</h1>-->
         <p class="description">"Nesta fase, a Terra sofreu uma intensa chuva de meteoritos, preparando o planeta para a vida..."</p>
         <button class="next-btn" data-next-scene="scene-6">AVANÇAR</button>
     </div>
@@ -52,11 +52,33 @@
     <!-- Cena 6 -->
     <div id="scene-6" class="scene hidden">
         <img src="https://uploads.onecompiler.io/43rztr8hr/43zm9qdbj/1000038862.png" alt="Cena 6">
-        <h1 class="caption">A ERA DOS DINOSSAUROS</h1>
+       <!-- <h1 class="caption">A ERA DOS DINOSSAUROS</h1>-->
         <p class="description">"Por 65 milhões de anos, os dinossauros foram os reis. Agora, prepare-se para a aventura!"</p>
         <button class="next-btn" data-next-scene="end">INICIAR O JOGO</button>
     </div>
 </div>
+ 
+ <!--- jogo -->
+ 
+ <div id="menu">
+  <canvas id="smokeCanvas"></canvas>
+  <canvas id="emberCanvas"></canvas>
+  <h1>A Era dos Dinossauros</h1>
+  <button id="startButton">Iniciar Jornada</button>
+</div>
+
+<div id="gameScreen">
+  <canvas id="gameCanvas" width="800" height="800"></canvas>
+  <img id="playerGif" src="https://uploads.onecompiler.io/43rztumwd/4428hartr/1000044774.gif">
+  <div id="gameOverScreen">
+    <h2>💥 GAME OVER 💥</h2>
+    <p id="finalScore"></p>
+    <button id="restartButton">Jogar Novamente</button>
+  </div>
+</div>
+
+<div id="flash"></div>
+<audio id="introSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_6793e2e2d5.mp3" preload="auto"></audio>
 
 <script src="script.js"></script>
 </body>
