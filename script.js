@@ -2,20 +2,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // =========================================================
     // 1. VARIÁVEIS DE ELEMENTOS HTML 
     // =========================================================
-    const introContainer = document.getElementById('intro-container'); // Do seu prompt anterior
-    const nextButtons = document.querySelectorAll('.next-btn');       // Do seu prompt anterior
-
+    const introContainer = document.getElementById('intro-container');
+    const nextButtons = document.querySelectorAll('.next-btn');
     const menu = document.getElementById("menu");
     const startButton = document.getElementById("startButton");
     const gameScreen = document.getElementById("gameScreen");
     const flash = document.getElementById("flash");
-    const gameCanvas = document.getElementById("gameCanvas"); // Renomeado para seguir o padrão
+    const gameCanvas = document.getElementById("gameCanvas");
     const ctx = gameCanvas.getContext("2d");
     const playerGif = document.getElementById("playerGif");
     const gameOverScreen = document.getElementById("gameOverScreen");
-    const finalScoreDisplay = document.getElementById("finalScore"); // Renomeado para 'finalScoreDisplay' para evitar conflito com 'finalScore' do HTML
+    
+    // 
+    const finalScoreDisplay = document.getElementById("finalScore"); 
+    
     const restartButton = document.getElementById("restartButton");
     const introSound = document.getElementById("introSound");
+    
+    // Referência ao novo display de recorde
+    const highScoreDisplay = document.getElementById("highScoreDisplay"); 
 
     // === EFEITOS VISUAIS (Fumaça e Brasas) ===
     const smokeCanvas = document.getElementById("smokeCanvas");
@@ -24,12 +29,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const emberCtx = emberCanvas.getContext("2d");
     let smokes = [], embers = [];
 
-    // =========================================================
-    // 2. CONFIGURAÇÃO INICIAL E EFEITOS VISUAIS (Menu)
-    // =========================================================
-
-    // *AJUSTE CRÍTICO*: Define as dimensões do Canvas do Jogo aqui, antes de usar player.y/x
-    gameCanvas.width = 800; // Defina um tamanho padrão
+    // 
+    
+    gameCanvas.width = 800;
     gameCanvas.height = 600;
 
     function resizeCanvas() {
@@ -39,7 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
 
-    // Classes Smoke e Ember - Mantidas exatamente como você enviou
     class Smoke {
         constructor() { this.reset(); }
         reset() { this.x = Math.random() * smokeCanvas.width; this.y = smokeCanvas.height + 50; this.size = Math.random() * 150 + 50; this.speedY = Math.random() * 0.3 + 0.2; this.alpha = Math.random() * 0.2 + 0.05; }
@@ -64,15 +65,9 @@ document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(animateFX);
     }
 
-    // =========================================================
-    // 3. LÓGICA DE TRANSIÇÃO DA INTRODUÇÃO (Do seu prompt anterior)
-    // =========================================================
-
-    // Garante que o menu e a tela de jogo estão escondidos ao iniciar
     menu.style.display = 'none';
     gameScreen.style.display = 'none';
 
-    // 3.1. Controle das Cenas da Introdução
     nextButtons.forEach(button => {
         button.addEventListener('click', () => {
             const currentScene = button.closest('.scene');
@@ -83,7 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (nextSceneId === 'end') {
-                // FIM DA INTRO -> MENU
                 currentScene.classList.add('hidden');
                 introContainer.style.transition = 'opacity 1s ease-out';
                 introContainer.style.opacity = '0';
@@ -91,22 +85,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => {
                     introContainer.style.display = 'none';
                     menu.style.display = 'flex';
-                    animateFX(); // Inicia a animação do menu
+                    animateFX();
                 }, 1000);
 
             } else {
-                // Transição de Cenas (Normal)
                 const nextScene = document.getElementById(nextSceneId);
-
                 currentScene.style.opacity = '0';
-
                 setTimeout(() => {
                     currentScene.style.display = 'none';
                     currentScene.classList.add('hidden');
-
                     if (nextScene) {
                         nextScene.style.display = 'flex';
-                        nextScene.offsetHeight; // Força reflow
+                        nextScene.offsetHeight;
                         nextScene.classList.remove('hidden');
                         nextScene.style.opacity = '1';
                     }
@@ -115,9 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 3.2. Iniciar Jogo (do Menu)
     startButton.addEventListener("click", () => {
-        // Efeito de flash
         flash.style.transition = "opacity 0.1s";
         flash.style.opacity = "1";
 
@@ -132,12 +120,11 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 menu.style.display = "none";
                 gameScreen.style.display = "flex";
-                startGame(); // Inicia o jogo principal
+                startGame();
             }, 1000);
         }, 800);
     });
 
-    // Garante que a primeira cena da intro inicie visível
     const scene1 = document.getElementById('scene-1');
     if (scene1) {
         scene1.classList.remove('hidden');
@@ -147,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // =========================================================
-    // 4. LÓGICA DO JOGO (CÓDIGO ORIGINAL COM METEORO)
+    // 4. LÓGICA DO JOGO
     // =========================================================
 
     let player = { x: (gameCanvas.width / 2) - 60, y: gameCanvas.height - 120, width: 120, height: 120, speed: 6 };
@@ -155,9 +142,20 @@ document.addEventListener('DOMContentLoaded', () => {
     let keys = {};
     let score = 0;
     let gameRunning = false;
+    
+    // 🌟 Variável de Recorde Global
+    let highScore = 0; 
+    
+    // ➡ VARIÁVEIS DE DIFICULDADE
+    let spawnProbability = 0.007;
+    let baseSpeed = 2;
+    const DIFFICULTY_INTERVAL = 1000;
+    const MAX_SPAWN_PROBABILITY = 0.03;
+    const MAX_SPEED = 7;
+    // ⬅FIM VARIÁVEIS DE DIFICULDADE
 
     const meteorImage = new Image();
-    meteorImage.src = "https://pngimg.com/uploads/meteor/meteor_PNG22.png"; // IMAGEM DO METEORO!
+    meteorImage.src = "https://pngimg.com/uploads/meteor/meteor_PNG22.png";
 
     // Controle teclado - Mantido
     document.addEventListener("keydown", e => keys[e.key] = true);
@@ -181,15 +179,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }, { passive: false });
 
-    // Criação meteoros - Mantido
+    // Criação meteoros - OK
     function createMeteor() {
         const size = 40 + Math.random() * 30;
         const x = Math.random() * (gameCanvas.width - size);
-        const speed = 2 + Math.random() * 3;
+        
+        const speed = baseSpeed + Math.random() * 2; 
+        
         meteors.push({ x, y: -size, width: size, height: size, speed });
     }
 
-    // Atualiza posição e colisão - Mantido
+    // Atualiza posição e colisão - OK
     function update() {
         // Movimento do Jogador
         if (keys["ArrowLeft"] && player.x > 0) player.x -= player.speed;
@@ -202,12 +202,25 @@ document.addEventListener('DOMContentLoaded', () => {
         playerGif.style.left = (rect.left + player.x) + "px";
         playerGif.style.top = (rect.top + player.y) + "px";
 
-        // Geração e movimento de meteoros
-        if (Math.random() < 0.007) 
+        // LÓGICA DE DIFICULDADE E GERAÇÃO
+        if (score > 0 && score % DIFFICULTY_INTERVAL === 0) {
+            if (spawnProbability < MAX_SPAWN_PROBABILITY) {
+                spawnProbability += 0.001;
+            }
+            if (baseSpeed < MAX_SPEED) {
+                baseSpeed += 0.5;
+            }
+            console.log(`Dificuldade aumentada! Probabilidade: ${spawnProbability.toFixed(4)}, Velocidade: ${baseSpeed.toFixed(1)}`);
+        }
+
+        // Geração de meteoros (usando a probabilidade variável)
+        if (Math.random() < spawnProbability) 
             createMeteor();
+            
+        // Movimento de meteoros
         meteors.forEach(m => m.y += m.speed);
         meteors = meteors.filter(m => m.y < gameCanvas.height);
-
+        
         // === COLISÃO REAL SOBRE O DINOSSAURO ===
         const playerHitbox = { x: player.x + 20, y: player.y + 20, width: player.width - 40, height: player.height - 40 };
 
@@ -220,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (hit) { gameOver(); return; }
         }
 
-        score++;
+        score++; // Incrementa a pontuação
     }
 
     // Desenha meteoros e pontuação - Mantido
@@ -234,14 +247,26 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.fillText(`Pontos: ${score}`, 10, 25);
     }
 
-    // Game over - Mantido
+    // Game over - OK
     function gameOver() {
         gameRunning = false;
         playerGif.style.display = "none";
         gameOverScreen.style.display = "flex";
-        finalScoreDisplay.textContent = "Pontos: " + score; // Usando o display correto
+        
+        // 1. Atualiza a pontuação final
+        finalScoreDisplay.textContent = "Pontos: " + score; 
+        
+        // 2.  LÓGICA DO RECORDE 
+        if (score > highScore) {
+            highScore = score;
+            localStorage.setItem('dinoRunnerHighScore', highScore);
+            console.log("NOVO RECORDE: " + highScore); 
+        }
+        
+        // 3. Exibe o Recorde (novo ou antigo)
+        highScoreDisplay.textContent = "Recorde: " + highScore;
     }
-
+    
     // Loop principal - Mantido
     function gameLoop() {
         if (gameRunning) {
@@ -251,10 +276,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Inicia jogo - Mantido
+    // Inicia jogo - OK
     function startGame() {
         meteors = [];
         score = 0;
+        
+        // REINICIA A DIFICULDADE
+        spawnProbability = 0.007;
+        baseSpeed = 2;
+        
         // Reinicia o player na posição correta do canvas definido
         player.x = (gameCanvas.width / 2) - (player.width / 2); 
         player.y = gameCanvas.height - 120;
@@ -267,4 +297,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // Botão de Restart - Mantido
     restartButton.addEventListener("click", startGame);
 
+    // =========================================================
+    //  RECORDE: FUNÇÃO MOVIDA PARA DENTRO DE DOMContentLoaded
+    // =========================================================
+    function loadHighScore() {
+        const savedHighScore = localStorage.getItem('dinoRunnerHighScore');
+        
+        // Agora, highScoreDisplay e as outras variáveis HTML JÁ EXISTEM
+        if (savedHighScore) {
+            highScore = parseInt(savedHighScore, 10);
+        }
+        // Garante que o display seja atualizado na inicialização
+        if (highScoreDisplay) {
+            highScoreDisplay.textContent = `Recorde: ${highScore}`;
+        }
+    }
+    
+    // Chame a função para carregar o recorde ao iniciar o DOM
+    loadHighScore(); 
 });
