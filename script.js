@@ -143,16 +143,16 @@ document.addEventListener('DOMContentLoaded', () => {
     let score = 0;
     let gameRunning = false;
     
-    // 🌟 Variável de Recorde Global
+    // Variável de Recorde Global
     let highScore = 0; 
     
-    // ➡ VARIÁVEIS DE DIFICULDADE
+    // VARIÁVEIS DE DIFICULDADE
     let spawnProbability = 0.007;
     let baseSpeed = 2;
     const DIFFICULTY_INTERVAL = 1000;
     const MAX_SPAWN_PROBABILITY = 0.03;
     const MAX_SPEED = 7;
-    // ⬅FIM VARIÁVEIS DE DIFICULDADE
+    // FIM VARIÁVEIS DE DIFICULDADE
 
     const meteorImage = new Image();
     meteorImage.src = "https://pngimg.com/uploads/meteor/meteor_PNG22.png";
