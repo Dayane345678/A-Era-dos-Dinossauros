@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let baseSpeed = 2;
     const DIFFICULTY_INTERVAL = 1000;
     const MAX_SPAWN_PROBABILITY = 0.03;
-    const MAX_SPEED = 7;
+    const MAX_SPEED = 8;
     // FIM VARIÁVEIS DE DIFICULDADE
 
     const meteorImage = new Image();
