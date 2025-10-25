@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const nextButtons = document.querySelectorAll('.next-btn');
     const menu = document.getElementById("menu");
     
-    // VARIÁVEL HTML: Referência ao campo de input do nome
+    // Campo de input do nome
     const playerNameInput = document.getElementById("playerNameInput"); 
 
     const startButton = document.getElementById("startButton");
@@ -20,8 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const finalScoreDisplay = document.getElementById("finalScore"); 
     
     const restartButton = document.getElementById("restartButton");
-    // Referência ao botão de Menu
-    const menuButton = document.getElementById("menuButton"); 
+    const menuButton = document.getElementById("menuButton"); // Botão Voltar ao Menu
     
     const introSound = document.getElementById("introSound");
     const gameMusic = document.getElementById("gameMusic");
@@ -76,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
     gameScreen.style.display = 'none';
     gameOverScreen.style.display = 'none';
 
-    // === LÓGICA DE TRANSIÇÃO DA INTRODUÇÃO (COM FOCO AUTOMÁTICO) ===
+    // === LÓGICA DE TRANSIÇÃO DA INTRODUÇÃO ===
     nextButtons.forEach(button => {
         button.addEventListener('click', () => {
             const currentScene = button.closest('.scene');
@@ -96,6 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     menu.style.display = 'flex';
                     animateFX(); 
                     
+                    // Foca no input ao abrir o menu
                     if (playerNameInput) {
                         playerNameInput.focus();
                     }
@@ -166,9 +166,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let gameRunning = false;
     
     let playerName = "Jogador"; 
+    // Array para armazenar o TOP 10 { name, score }
     let highScores = []; 
     
-    // VARIÁVEIS DE DIFICULDADE
+    // Variáveis de Dificuldade
     let spawnProbability = 0.007;
     let baseSpeed = 2;
     const DIFFICULTY_INTERVAL = 1000;
@@ -178,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const meteorImage = new Image();
     meteorImage.src = "https://pngimg.com/uploads/meteor/meteor_PNG22.png";
 
-    // CONTROLE TECLADO (Impede que setas movam o jogador enquanto digita o nome)
+    // CONTROLE TECLADO: Impede que setas movam o jogador enquanto digita o nome
     document.addEventListener("keydown", e => {
         if (gameRunning && e.target !== playerNameInput) {
              keys[e.key] = true;
@@ -240,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
         playerGif.style.left = (rect.left + player.x) + "px";
         playerGif.style.top = (rect.top + player.y) + "px";
 
-        // LÓGICA DE DIFICULDADE E GERAÇÃO
+        // Lógica de Dificuldade
         if (score > 0 && score % DIFFICULTY_INTERVAL === 0) {
             if (spawnProbability < MAX_SPAWN_PROBABILITY) {
                 spawnProbability += 0.001;
@@ -258,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
         meteors.forEach(m => m.y += m.speed);
         meteors = meteors.filter(m => m.y < gameCanvas.height);
         
-        // === COLISÃO ===
+        // Colisão
         const playerHitbox = { x: player.x + 20, y: player.y + 20, width: player.width - 40, height: player.height - 40 };
 
         for (const m of meteors) {
@@ -270,10 +271,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (hit) { gameOver(); return; }
         }
 
-        score++; // Incrementa a pontuação
+        score++; 
     }
 
-    // Desenha meteoros, pontuação e nome
+    // Desenha na tela
     function draw() {
         ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
         meteors.forEach(m => ctx.drawImage(meteorImage, m.x, m.y, m.width, m.height));
@@ -302,6 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
         highScores.forEach((item, index) => {
             const listItem = document.createElement('li');
             
+            // Verifica se o recorde atual é o que acabou de ser feito (para destaque)
             const isNewRecord = (item.name === playerName && item.score === score);
 
             listItem.innerHTML = `${index + 1}. **${item.name}**: ${item.score} pts`;
@@ -313,6 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
             highScoresList.appendChild(listItem);
         });
         
+        // Atualiza o display do Menu (para o melhor recorde)
         loadHighScores(); 
     }
 
@@ -334,7 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
             highScores.push({ name: playerName, score: score });
             
             highScores.sort((a, b) => b.score - a.score); 
-            highScores = highScores.slice(0, 10); 
+            highScores = highScores.slice(0, 10); // Mantém o top 10
             
             localStorage.setItem('dinoRunnerHighScores', JSON.stringify(highScores));
         }
@@ -376,16 +379,20 @@ document.addEventListener('DOMContentLoaded', () => {
         gameLoop();
     }
 
-    // Voltar ao Menu
+    // FUNÇÃO : Voltar ao Menu
     function goToMenu() {
         gameOverScreen.style.display = "none";
         gameScreen.style.display = "none";
 
-        // Faz o fade-in do menu
         menu.classList.remove("fade-out");
         menu.style.display = "flex";
 
-        // Toca a música do menu
+        // 🌟 CORREÇÃO DO BUG: Preenche o input e foca para permitir edição
+        if (playerNameInput) {
+            playerNameInput.value = playerName; 
+            playerNameInput.focus(); 
+        }
+
         if (introSound && introSound.paused) {
             introSound.play().catch(e => console.error("Erro ao tocar áudio (Menu):", e));
         }
@@ -396,11 +403,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // 5. EVENT LISTENERS DOS BOTÕES
     // =========================================================
     restartButton.addEventListener("click", startGame);
-    // NOVO EVENT LISTENER
     menuButton.addEventListener("click", goToMenu);
 
     // =========================================================
-    // 6. CARREGAMENTO INICIAL
+    // 6. CARREGAMENTO INICIAL (Recordes)
     // =========================================================
     function loadHighScores() {
         const savedScores = localStorage.getItem('dinoRunnerHighScores');
@@ -423,4 +429,3 @@ document.addEventListener('DOMContentLoaded', () => {
     
     loadHighScores(); 
 });
-    
