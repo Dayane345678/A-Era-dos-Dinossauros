@@ -65,6 +65,13 @@
   <canvas id="smokeCanvas"></canvas>
   <canvas id="emberCanvas"></canvas>
   <h3>A Era dos Dinossauros</h3>
+  <input 
+        type="text" 
+        id="playerNameInput" 
+        placeholder="Digite seu nome (máx. 10)" 
+        maxlength="10" 
+        style=" background: orange; padding: 10px; margin-bottom: 20px; font-size: 16px; border-radius: 5px;"
+    >
   <button id="startButton">Iniciar Jornada</button>
 </div>
 
@@ -72,10 +79,21 @@
   <canvas id="gameCanvas" width="800" height="800"></canvas>
   <img id="playerGif" src="https://uploads.onecompiler.io/43rztumwd/4428hartr/1000044774.gif">
   <div id="gameOverScreen">
-    <h2>💥 GAME OVER 💥</h2>
-    <p id="finalScore"></p>
     <p id="highScoreDisplay">Recorde: 0</p>
+    <h2>☄️FIM DE JOGO☄️</h2>
     <button id="restartButton">Jogar Novamente</button>
+    <h2>🔥Você foi extinto!🔥</h2>
+    <p id="finalScore">Sua Pontuação: 0</p>
+    <h3>Tabela de Recordes</h3>
+    <ul id="highScoresList">
+        </ul>
+    <button 
+    id="menuButton"
+    style="padding: 10px; margin-bottom: 20px; font-size: 16px; border-radius: 5px;"
+>
+  Menu Principal 
+</button>
+
   </div>
 </div>
 
