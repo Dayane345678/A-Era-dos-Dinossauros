@@ -1,10 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
     // =========================================================
-    // 1. VARIÁVEIS DE ELEMENTOS HTML 
+    // 1. VARIÁVEIS DE ELEMENTOS HTML
     // =========================================================
     const introContainer = document.getElementById('intro-container');
     const nextButtons = document.querySelectorAll('.next-btn');
     const menu = document.getElementById("menu");
+    
+    // VARIÁVEL HTML: Referência ao campo de input do nome
+    const playerNameInput = document.getElementById("playerNameInput"); 
+
     const startButton = document.getElementById("startButton");
     const gameScreen = document.getElementById("gameScreen");
     const flash = document.getElementById("flash");
@@ -13,14 +17,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const playerGif = document.getElementById("playerGif");
     const gameOverScreen = document.getElementById("gameOverScreen");
     
-    // 
     const finalScoreDisplay = document.getElementById("finalScore"); 
     
     const restartButton = document.getElementById("restartButton");
-    const introSound = document.getElementById("introSound");
+    // Referência ao botão de Menu
+    const menuButton = document.getElementById("menuButton"); 
     
-    // Referência ao novo display de recorde
+    const introSound = document.getElementById("introSound");
+    const gameMusic = document.getElementById("gameMusic");
+    
     const highScoreDisplay = document.getElementById("highScoreDisplay"); 
+    const highScoresList = document.getElementById("highScoresList"); 
 
     // === EFEITOS VISUAIS (Fumaça e Brasas) ===
     const smokeCanvas = document.getElementById("smokeCanvas");
@@ -29,8 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const emberCtx = emberCanvas.getContext("2d");
     let smokes = [], embers = [];
 
-    // 
-    
     gameCanvas.width = 800;
     gameCanvas.height = 600;
 
@@ -64,17 +69,21 @@ document.addEventListener('DOMContentLoaded', () => {
         embers.forEach(e => { e.update(); e.draw(); });
         requestAnimationFrame(animateFX);
     }
+    
+    let gameFrame; 
 
     menu.style.display = 'none';
     gameScreen.style.display = 'none';
+    gameOverScreen.style.display = 'none';
 
+    // === LÓGICA DE TRANSIÇÃO DA INTRODUÇÃO (COM FOCO AUTOMÁTICO) ===
     nextButtons.forEach(button => {
         button.addEventListener('click', () => {
             const currentScene = button.closest('.scene');
             const nextSceneId = button.getAttribute('data-next-scene');
 
-            if (introSound.paused) {
-                introSound.play().catch(e => console.error("Erro ao tocar áudio:", e));
+            if (introSound && introSound.paused) {
+                introSound.play().catch(e => console.error("Erro ao tocar áudio (Intro):", e));
             }
 
             if (nextSceneId === 'end') {
@@ -85,7 +94,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => {
                     introContainer.style.display = 'none';
                     menu.style.display = 'flex';
-                    animateFX();
+                    animateFX(); 
+                    
+                    if (playerNameInput) {
+                        playerNameInput.focus();
+                    }
+                    
                 }, 1000);
 
             } else {
@@ -105,12 +119,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // === LÓGICA DO BOTÃO INICIAR ===
     startButton.addEventListener("click", () => {
+        // CAPTURA O NOME DO JOGADOR
+        if (playerNameInput) {
+            let name = playerNameInput.value.trim();
+            playerName = name.length > 0 ? name : "Jogador"; 
+        }
+
         flash.style.transition = "opacity 0.1s";
         flash.style.opacity = "1";
 
         if (introSound && !introSound.paused) {
             introSound.pause();
+            introSound.currentTime = 0; 
         }
 
         setTimeout(() => {
@@ -143,29 +165,41 @@ document.addEventListener('DOMContentLoaded', () => {
     let score = 0;
     let gameRunning = false;
     
-    // Variável de Recorde Global
-    let highScore = 0; 
+    let playerName = "Jogador"; 
+    let highScores = []; 
     
     // VARIÁVEIS DE DIFICULDADE
     let spawnProbability = 0.007;
     let baseSpeed = 2;
     const DIFFICULTY_INTERVAL = 1000;
     const MAX_SPAWN_PROBABILITY = 0.03;
-    const MAX_SPEED = 8;
-    // FIM VARIÁVEIS DE DIFICULDADE
+    const MAX_SPEED = 7;
 
     const meteorImage = new Image();
     meteorImage.src = "https://pngimg.com/uploads/meteor/meteor_PNG22.png";
 
-    // Controle teclado - Mantido
-    document.addEventListener("keydown", e => keys[e.key] = true);
+    // CONTROLE TECLADO (Impede que setas movam o jogador enquanto digita o nome)
+    document.addEventListener("keydown", e => {
+        if (gameRunning && e.target !== playerNameInput) {
+             keys[e.key] = true;
+        }
+    });
+    
     document.addEventListener("keyup", e => keys[e.key] = false);
 
-    // Controle toque - Mantido
+    // Controle toque
     let touchStartX = null, touchStartY = null;
-    document.addEventListener("touchstart", e => { if (e.touches.length === 1) { touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY; } });
+    
+    document.addEventListener("touchstart", e => { 
+        if (gameRunning && e.touches.length === 1 && e.target === gameCanvas) { 
+            touchStartX = e.touches[0].clientX; 
+            touchStartY = e.touches[0].clientY; 
+        }
+    });
+    
     document.addEventListener("touchmove", e => {
-        if (!gameRunning) return;
+        if (!gameRunning || touchStartX === null) return;
+        
         if (e.touches.length === 1) {
             const deltaX = e.touches[0].clientX - touchStartX;
             const deltaY = e.touches[0].clientY - touchStartY;
@@ -175,11 +209,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (player.x > gameCanvas.width - player.width) player.x = gameCanvas.width - player.width;
             if (player.y < 0) player.y = 0;
             if (player.y > gameCanvas.height - player.height) player.y = gameCanvas.height - player.height;
-            touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY; e.preventDefault();
+            touchStartX = e.touches[0].clientX; 
+            touchStartY = e.touches[0].clientY; 
+            e.preventDefault();
         }
     }, { passive: false });
 
-    // Criação meteoros - OK
+    // Criação meteoros
     function createMeteor() {
         const size = 40 + Math.random() * 30;
         const x = Math.random() * (gameCanvas.width - size);
@@ -189,8 +225,10 @@ document.addEventListener('DOMContentLoaded', () => {
         meteors.push({ x, y: -size, width: size, height: size, speed });
     }
 
-    // Atualiza posição e colisão - OK
+    // Atualiza posição e colisão
     function update() {
+        if (!gameRunning) return;
+        
         // Movimento do Jogador
         if (keys["ArrowLeft"] && player.x > 0) player.x -= player.speed;
         if (keys["ArrowRight"] && player.x < gameCanvas.width - player.width) player.x += player.speed;
@@ -210,10 +248,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (baseSpeed < MAX_SPEED) {
                 baseSpeed += 0.5;
             }
-            console.log(`Dificuldade aumentada! Probabilidade: ${spawnProbability.toFixed(4)}, Velocidade: ${baseSpeed.toFixed(1)}`);
         }
 
-        // Geração de meteoros (usando a probabilidade variável)
+        // Geração de meteoros
         if (Math.random() < spawnProbability) 
             createMeteor();
             
@@ -221,7 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
         meteors.forEach(m => m.y += m.speed);
         meteors = meteors.filter(m => m.y < gameCanvas.height);
         
-        // === COLISÃO REAL SOBRE O DINOSSAURO ===
+        // === COLISÃO ===
         const playerHitbox = { x: player.x + 20, y: player.y + 20, width: player.width - 40, height: player.height - 40 };
 
         for (const m of meteors) {
@@ -236,83 +273,154 @@ document.addEventListener('DOMContentLoaded', () => {
         score++; // Incrementa a pontuação
     }
 
-    // Desenha meteoros e pontuação - Mantido
+    // Desenha meteoros, pontuação e nome
     function draw() {
         ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
-        // Desenha a imagem do meteoro
         meteors.forEach(m => ctx.drawImage(meteorImage, m.x, m.y, m.width, m.height));
         
         ctx.fillStyle = "black";
         ctx.font = "20px Arial";
+        
         ctx.fillText(`Pontos: ${score}`, 10, 25);
+        
+        const textToDisplay = `Jogador: ${playerName}`;
+        const textWidth = ctx.measureText(textToDisplay).width;
+        ctx.fillText(textToDisplay, gameCanvas.width - textWidth - 10, 25);
+    }
+    
+    // Função para atualizar a tabela de recordes na tela de Game Over
+    function updateHighScoresTable() {
+        if (!highScoresList) return; 
+
+        highScoresList.innerHTML = ''; 
+        
+        if (highScores.length === 0) {
+            highScoresList.innerHTML = '<li>Nenhum recorde salvo.</li>';
+            return;
+        }
+
+        highScores.forEach((item, index) => {
+            const listItem = document.createElement('li');
+            
+            const isNewRecord = (item.name === playerName && item.score === score);
+
+            listItem.innerHTML = `${index + 1}. **${item.name}**: ${item.score} pts`;
+            
+            if (isNewRecord) {
+                 listItem.style.color = 'gold'; 
+                 listItem.style.fontWeight = 'bold';
+            }
+            highScoresList.appendChild(listItem);
+        });
+        
+        loadHighScores(); 
     }
 
-    // Game over - OK
+    // Game over
     function gameOver() {
         gameRunning = false;
         playerGif.style.display = "none";
         gameOverScreen.style.display = "flex";
         
-        // 1. Atualiza a pontuação final
-        finalScoreDisplay.textContent = "Pontos: " + score; 
-        
-        // 2.  LÓGICA DO RECORDE 
-        if (score > highScore) {
-            highScore = score;
-            localStorage.setItem('dinoRunnerHighScore', highScore);
-            console.log("NOVO RECORDE: " + highScore); 
+        if (gameMusic) {
+            gameMusic.pause();
+            gameMusic.currentTime = 0; 
         }
         
-        // 3. Exibe o Recorde (novo ou antigo)
-        highScoreDisplay.textContent = "Recorde: " + highScore;
+        finalScoreDisplay.textContent = `Sua Pontuação: ${playerName} - ${score} pts`; 
+        
+        // LÓGICA DE SALVAR O RECORDE
+        if (score > 0) {
+            highScores.push({ name: playerName, score: score });
+            
+            highScores.sort((a, b) => b.score - a.score); 
+            highScores = highScores.slice(0, 10); 
+            
+            localStorage.setItem('dinoRunnerHighScores', JSON.stringify(highScores));
+        }
+        
+        // EXIBE A TABELA DE RECORDES
+        updateHighScoresTable();
+        
+        cancelAnimationFrame(gameFrame); 
     }
     
-    // Loop principal - Mantido
+    // Loop principal
     function gameLoop() {
         if (gameRunning) {
             update();
             draw();
-            requestAnimationFrame(gameLoop);
+            gameFrame = requestAnimationFrame(gameLoop);
         }
     }
 
-    // Inicia jogo - OK
+    // Inicia jogo
     function startGame() {
         meteors = [];
         score = 0;
         
-        // REINICIA A DIFICULDADE
         spawnProbability = 0.007;
         baseSpeed = 2;
         
-        // Reinicia o player na posição correta do canvas definido
         player.x = (gameCanvas.width / 2) - (player.width / 2); 
         player.y = gameCanvas.height - 120;
         gameOverScreen.style.display = "none";
         playerGif.style.display = "block";
         gameRunning = true;
+        
+        if (gameMusic) {
+            gameMusic.volume = 0.5;
+            gameMusic.play().catch(e => console.error("Erro ao tocar música do jogo:", e));
+        }
+        
         gameLoop();
     }
 
-    // Botão de Restart - Mantido
-    restartButton.addEventListener("click", startGame);
+    // Voltar ao Menu
+    function goToMenu() {
+        gameOverScreen.style.display = "none";
+        gameScreen.style.display = "none";
+
+        // Faz o fade-in do menu
+        menu.classList.remove("fade-out");
+        menu.style.display = "flex";
+
+        // Toca a música do menu
+        if (introSound && introSound.paused) {
+            introSound.play().catch(e => console.error("Erro ao tocar áudio (Menu):", e));
+        }
+    }
+
 
     // =========================================================
-    //  RECORDE: FUNÇÃO MOVIDA PARA DENTRO DE DOMContentLoaded
+    // 5. EVENT LISTENERS DOS BOTÕES
     // =========================================================
-    function loadHighScore() {
-        const savedHighScore = localStorage.getItem('dinoRunnerHighScore');
+    restartButton.addEventListener("click", startGame);
+    // NOVO EVENT LISTENER
+    menuButton.addEventListener("click", goToMenu);
+
+    // =========================================================
+    // 6. CARREGAMENTO INICIAL
+    // =========================================================
+    function loadHighScores() {
+        const savedScores = localStorage.getItem('dinoRunnerHighScores');
         
-        // Agora, highScoreDisplay e as outras variáveis HTML JÁ EXISTEM
-        if (savedHighScore) {
-            highScore = parseInt(savedHighScore, 10);
+        if (savedScores) {
+            highScores = JSON.parse(savedScores);
+        } else {
+            highScores = [];
         }
-        // Garante que o display seja atualizado na inicialização
-        if (highScoreDisplay) {
-            highScoreDisplay.textContent = `Recorde: ${highScore}`;
+
+        if (highScores.length > 0) {
+            highScores.sort((a, b) => b.score - a.score); 
+            if (highScoreDisplay) {
+                highScoreDisplay.textContent = `Recorde Global: ${highScores[0].name} (${highScores[0].score} pts)`;
+            }
+        } else if (highScoreDisplay) {
+            highScoreDisplay.textContent = `Recorde Global: N/A`;
         }
     }
     
-    // Chame a função para carregar o recorde ao iniciar o DOM
-    loadHighScore(); 
+    loadHighScores(); 
 });
+    
