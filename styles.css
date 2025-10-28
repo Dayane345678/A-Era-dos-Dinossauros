@@ -112,7 +112,7 @@ animation:fadeIn 4s ease-in forwards; animation-delay:2s; }
 background: radial-gradient(circle, rgba(255,180,0,1) 0%, rgba(0,0,0,0) 100%); opacity:0; pointer-events:none; z-index:10; }
 
 #gameScreen { display:none; position:fixed; width:100%; height:100%;
-background:url('https://uploads.onecompiler.io/43rztumwd/4428hartr/Imagem%20de%20Fundo%20laranja.png') no-repeat center center;
+background:url('https://uploads.onecompiler.io/43rztr8hr/442ev9u6h/Logica%20de%20Programa%C3%A7a%C3%B5.png') no-repeat center center;
 background-size:cover; justify-content:center; align-items:center; flex-direction:column; }
 
 canvas { background:transparent; display:block; margin:auto; }
