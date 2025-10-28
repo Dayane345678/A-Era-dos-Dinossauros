@@ -387,7 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
         menu.classList.remove("fade-out");
         menu.style.display = "flex";
 
-        // 🌟 CORREÇÃO DO BUG: Preenche o input e foca para permitir edição
+        //Preenche o input e foca para permitir edição
         if (playerNameInput) {
             playerNameInput.value = playerName; 
             playerNameInput.focus(); 
